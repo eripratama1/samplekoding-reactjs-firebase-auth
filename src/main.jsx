@@ -11,3 +11,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </Router>
   </React.StrictMode>,
 )
+
+// Kode di atas secara keseluruhan adalah 
+// pengaturan awal untuk aplikasi React dimana kita menggunakan React Router untuk mengelola navigasi
