@@ -26,7 +26,7 @@ const firebaseConfig = {
     authDomain: "your authDomain",
     projectId: "your project ID",
     storageBucket: "your storage bucket",
-    messagingSenderId: "your sender ID",
+    messagingSenderId: "your sender IDs",
     appId: "your app ID"
 };
 // firebaseConfig adalah objek yang berisi konfigurasi Firebase Anda. 

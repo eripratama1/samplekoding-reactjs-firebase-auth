@@ -10,7 +10,6 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-src/hooks/firebase.js
 *.local
 
 # Editor directories and files
@@ -23,3 +22,4 @@ src/hooks/firebase.js
 *.njsproj
 *.sln
 *.sw?
+src/hooks/firebase.js
