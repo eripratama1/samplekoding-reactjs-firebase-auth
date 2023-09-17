@@ -22,12 +22,12 @@ import { getStorage } from "firebase/storage"
 // seperti gambar, video, dan dokumen dalam aplikasi Anda.
 
 const firebaseConfig = {
-    apiKey: "your api key",
-    authDomain: "your authDomain",
-    projectId: "your project ID",
-    storageBucket: "your storage bucket",
-    messagingSenderId: "your sender IDs",
-    appId: "your app ID"
+    apiKey: "AIzaSyC9I7jGyzx5an487mqhDYwHibI3HFEZ4-g",
+    authDomain: "reactjs-auth-f153e.firebaseapp.com",
+    projectId: "reactjs-auth-f153e",
+    storageBucket: "reactjs-auth-f153e.appspot.com",
+    messagingSenderId: "527985373708",
+    appId: "1:527985373708:web:28277eb9084e8983a03429"
 };
 // firebaseConfig adalah objek yang berisi konfigurasi Firebase Anda. 
 // Ini mencakup informasi seperti apiKey, authDomain, projectId, dll. 

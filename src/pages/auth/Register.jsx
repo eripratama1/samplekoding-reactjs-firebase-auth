@@ -1,11 +1,65 @@
 import { Link } from "react-router-dom"
 import LogoDark from "../../images/logo/logo-dark.svg"
 import Logo from "../../images/logo/logo.svg"
+import { useState } from "react"
+import { createUserWithEmailAndPassword } from "firebase/auth"
+import { auth, db } from "../../hooks/firebase"
+import { doc, serverTimestamp, setDoc } from "firebase/firestore"
+import toast, { Toaster } from "react-hot-toast"
 
 const Register = () => {
 
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  // Deklarasi fungsi registerNewUser dengan asynchronous
+  const registerNewUser = async (e) => {
+    e.preventDefault()
+
+    // Jika salah satu state masih dalam keadaan kosong maka jalankan kode berikut
+    if (!name || !password || !email) {
+      // Lalu tampilkan pesan error 
+      toast.error('Data masih ada yang kosong')
+      // kemudian fungsi berakhir dengan pernyataan return sehingga kode selanjutnya tidak akan dijalankan.
+      return
+    }
+
+    // Memanggil fungsi createUserWithEmailAndPassword() firebase
+    // dengan tiga argumen: auth, email, dan password. Fungsi ini digunakan untuk membuat user baru dengan email 
+    // dan kata sandi yang diberikan. Setelah operasi ini berhasil, maka then() akan dijalankan, yang kemudian akan 
+    // menerima userCredential sebagai argumen.
+    await createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
+      // Kode ini mengambil uid (identifikasi unik pengguna) dari 
+      // objek user yang ada dalam userCredential dan menyimpannya dalam variabel userId.
+      const userId = userCredential.user.uid
+      console.log(userId);
+
+      // Pembuatan objek docRef yang berisi informasi pengguna seperti name, email, userId, dan created_at. 
+      const docRef = {
+        name: name,
+        email: email,
+        userId: userId,
+        created_at: serverTimestamp()
+      }
+
+      // Fungsi Firebase untuk menyimpan dokumen (docRef) dalam 
+      // koleksi 'users' dengan ID dokumen yang sama dengan nilai userId yang dibuat saat registrasi.
+      setDoc(doc(db, 'users', userId), docRef)
+
+      // kode ini mengosongkan state name, password, dan email,setelah proses registrasi berhasil.
+      setName('')
+      setPassword('')
+      setEmail('')
+    })
+      .then((error) => {
+        toast.error(error)
+      })
+  }
+
   return (
     <>
+    <div><Toaster/></div>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
@@ -152,7 +206,7 @@ const Register = () => {
                 Register New Account
               </h2>
 
-              <form>
+              <form onSubmit={registerNewUser}>
 
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
@@ -161,6 +215,8 @@ const Register = () => {
                   <div className="relative">
                     <input
                       type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                       placeholder="Enter your name"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
@@ -188,6 +244,8 @@ const Register = () => {
                   <div className="relative">
                     <input
                       type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
@@ -219,6 +277,8 @@ const Register = () => {
                   <div className="relative">
                     <input
                       type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       placeholder="6+ Characters, 1 Capital letter"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
