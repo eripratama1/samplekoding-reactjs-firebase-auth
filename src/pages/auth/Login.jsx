@@ -1,9 +1,74 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, Navigate } from 'react-router-dom'
 import LogoDark from "../../images/logo/logo-dark.svg"
 import Logo from "../../images/logo/logo.svg"
+import toast from 'react-hot-toast'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../../hooks/firebase'
 
 const Login = () => {
+
+    // Menambahkan Hook useState untuk membuat variabel yang akan mengelola input email, password & status login
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [isLoggedIn, setisLoggedIn] = useState(false)
+
+    // Penggunaan hook useEffect disini untuk melakukan pengecekan pada localStorage
+    // apakah ada data login yang tersimpan di dalam localstorage
+
+    useEffect(() => {
+        const checkDataLogin = localStorage.getItem('LOGGED_IN')
+        if (checkDataLogin) {
+            setisLoggedIn(true)
+        }
+    }, [])
+
+    // Jika data login ada dalam localStorage, maka komponen akan mengembalikan komponen <Navigate to="/" />, 
+    // yang akan mengarahkan pengguna ke halaman utama setelah login.
+
+    if (localStorage.getItem('LOGGED_IN')) {
+        return <Navigate to="/" />
+    }
+
+
+
+    const loginUser = async (e) => {
+        e.preventDefault()
+
+        // Ini adalah pernyataan kondisional yang memeriksa apakah variabel email atau password kosong atau tidak terdefinisi. 
+        // Jika salah satu dari keduanya kosong, itu berarti data login belum lengkap, dan akan menampilkan pesan kesalahan 
+        // menggunakan library "toast"
+
+        if (!email || !password) {
+            return toast.error('Data login belum lengkap')
+        }
+
+        // penggunaan asynchronous (async await) untuk memanggil fungsi signInWithEmailAndPassword dari firebase. 
+        // Fungsi ini mengambil tiga argumen: auth adalah objek autentikasi , email dan password yang dimasukkan oleh pengguna.
+
+        await signInWithEmailAndPassword(auth, email, password)
+
+            // ini adalah bagian dari penanganan hasil dari panggilan asynchronous signInWithEmailAndPassword. 
+            // Ketika proses login berhasil, userCredential akan berisi informasi tentang pengguna yang berhasil login.
+            .then((userCredential) => {
+
+                // const userId = userCredential.user.uid: Di sini, kode mengekstrak UID (User ID) dari objek user dalam userCredential. 
+                // UID ini kemudian disimpan dalam localStorage dengan kunci 'LOGGED_IN', yang menandakan bahwa pengguna telah berhasil login.
+
+                // setisLoggedIn(true): Ini adalah fungsi yang mungkin akan mengubah status login pengguna . 
+                // Ini akan mengatur status login menjadi true.
+
+                const userId = userCredential.user.uid
+                // console.log(userId);
+                localStorage.setItem('LOGGED_IN', userId)
+                setisLoggedIn(true)
+            })
+            .catch((err) => {
+                const errorMessage = err.message
+                toast.error(errorMessage)
+            })
+    }
+
     return (
         <React.Fragment>
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -152,7 +217,7 @@ const Login = () => {
                                 Sign In to TailAdmin
                             </h2>
 
-                            <form>
+                            <form onSubmit={loginUser}>
                                 <div className="mb-4">
                                     <label className="mb-2.5 block font-medium text-black dark:text-white">
                                         Email
@@ -160,6 +225,8 @@ const Login = () => {
                                     <div className="relative">
                                         <input
                                             type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
                                             placeholder="Enter your email"
                                             className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                                         />
@@ -191,6 +258,8 @@ const Login = () => {
                                     <div className="relative">
                                         <input
                                             type="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
                                             placeholder="Enter password"
                                             className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                                         />
