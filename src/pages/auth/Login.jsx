@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import LogoDark from "../../images/logo/logo-dark.svg"
 import Logo from "../../images/logo/logo.svg"
-import toast from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../../hooks/firebase'
 
@@ -52,16 +52,25 @@ const Login = () => {
             // Ketika proses login berhasil, userCredential akan berisi informasi tentang pengguna yang berhasil login.
             .then((userCredential) => {
 
-                // const userId = userCredential.user.uid: Di sini, kode mengekstrak UID (User ID) dari objek user dalam userCredential. 
-                // UID ini kemudian disimpan dalam localStorage dengan kunci 'LOGGED_IN', yang menandakan bahwa pengguna telah berhasil login.
+                // variabel emailVerified yang akan digunakan untuk menyimpan status verifikasi alamat email pengguna.
+                // ini dilakukan dengan mengakses properti emailVerified dari objek user yang ada dalam objek userCredential. 
+                // userCredential adalah hasil dari operasi autentikasi yang telah berhasil, seperti login atau pendaftaran.
+                const emailVerified = userCredential.user.emailVerified
 
-                // setisLoggedIn(true): Ini adalah fungsi yang mungkin akan mengubah status login pengguna . 
-                // Ini akan mengatur status login menjadi true.
+                if (!emailVerified) {
+                    toast.error("Email belum terverifikasi")
+                } else {
 
-                const userId = userCredential.user.uid
-                // console.log(userId);
-                localStorage.setItem('LOGGED_IN', userId)
-                setisLoggedIn(true)
+                    // const userId = userCredential.user.uid: Di sini, kode mengekstrak UID (User ID) dari objek user dalam userCredential. 
+                    // UID ini kemudian disimpan dalam localStorage dengan kunci 'LOGGED_IN', yang menandakan bahwa pengguna telah berhasil login.
+
+                    // setisLoggedIn(true): Ini adalah fungsi yang mungkin akan mengubah status login pengguna . 
+                    // Ini akan mengatur status login menjadi true.
+                    const userId = userCredential.user.uid
+                    // console.log(userId);
+                    localStorage.setItem('LOGGED_IN', userId)
+                    setisLoggedIn(true)
+                }
             })
             .catch((err) => {
                 const errorMessage = err.message
@@ -71,6 +80,7 @@ const Login = () => {
 
     return (
         <React.Fragment>
+            <div><Toaster/></div>
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                 <div className="flex flex-wrap items-center">
                     <div className="hidden w-full xl:block xl:w-1/2">

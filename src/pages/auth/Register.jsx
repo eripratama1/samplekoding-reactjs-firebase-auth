@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import LogoDark from "../../images/logo/logo-dark.svg"
 import Logo from "../../images/logo/logo.svg"
 import { useState } from "react"
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth"
 import { auth, db } from "../../hooks/firebase"
 import { doc, serverTimestamp, setDoc } from "firebase/firestore"
 import toast, { Toaster } from "react-hot-toast"
@@ -35,31 +35,44 @@ const Register = () => {
       const userId = userCredential.user.uid
       console.log(userId);
 
-      // Pembuatan objek docRef yang berisi informasi pengguna seperti name, email, userId, dan created_at. 
-      const docRef = {
-        name: name,
-        email: email,
-        userId: userId,
-        created_at: serverTimestamp()
-      }
+      // sendEmailVerification(auth.currentUser): Ini adalah fungsi yang digunakan untuk mengirim email verifikasi ke alamat email 
+      // pengguna yang saat ini terotentikasi. Proses ini akan mengirimkan email verifikasi yang berisi tautan atau instruksi 
+      // kepada pengguna untuk mengkonfirmasi bahwa alamat email yang mereka berikan adalah alamat email yang valid dan aktif.
 
-      // Fungsi Firebase untuk menyimpan dokumen (docRef) dalam 
-      // koleksi 'users' dengan ID dokumen yang sama dengan nilai userId yang dibuat saat registrasi.
-      setDoc(doc(db, 'users', userId), docRef)
+      sendEmailVerification(auth.currentUser).then(() => {
+        
+        toast.success("Email verifikasi dikirim")
+        // Pembuatan objek docRef yang berisi informasi pengguna seperti name, email, userId, dan created_at. 
+        const docRef = {
+          name: name,
+          email: email,
+          userId: userId,
+          created_at: serverTimestamp()
+        }
 
-      // kode ini mengosongkan state name, password, dan email,setelah proses registrasi berhasil.
-      setName('')
-      setPassword('')
-      setEmail('')
-    })
-      .then((error) => {
-        toast.error(error)
+        // Fungsi Firebase untuk menyimpan dokumen (docRef) dalam 
+        // koleksi 'users' dengan ID dokumen yang sama dengan nilai userId yang dibuat saat registrasi.
+        setDoc(doc(db, 'users', userId), docRef)
+
+        // kode ini mengosongkan state name, password, dan email,setelah proses registrasi berhasil.
+        setName('')
+        setPassword('')
+        setEmail('')
       })
+        .catch((error) => {
+          toast.error(error)
+          return
+        })
+    })
+    .catch((err) => {
+      toast.error(err);
+    })
+
   }
 
   return (
     <>
-    <div><Toaster/></div>
+      <div><Toaster /></div>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
