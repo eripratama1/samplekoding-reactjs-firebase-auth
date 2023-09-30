@@ -1,10 +1,29 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, Navigate } from 'react-router-dom'
 import Logo from "../images/logo/logo-icon.svg"
 import DarkModeSwitcher from './DarkModeSwitcher'
 import DropdownUser from './DropdownUser'
+import { signOut } from 'firebase/auth'
+import { auth } from '../hooks/firebase'
 
 const Header = (props) => {
+
+    const [isLoggedOut, setIsLoggedOut] = useState(false)
+
+    // Ini adalah fungsi yang dipanggil ketika pengguna ingin logout. 
+    // Fungsi ini memanggil signOut(auth) (firebase) untuk logout pengguna menggunakan autentikasi Firebase.
+    const logoutUser = (e) => {
+        e.preventDefault()
+        signOut(auth).then(() => {
+            setIsLoggedOut(true)
+            localStorage.clear()
+        })
+    }
+
+    // Jika state logout bernilai true arahkan user kembali ke halaman login
+    if (isLoggedOut) {
+        return <Navigate to="/auth/login"/>
+    }
     return (
         <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
             <div className="flex flex-grow items-center justify-between py-4 px-4 shadow-2 md:px-6 2xl:px-11">
@@ -96,7 +115,7 @@ const Header = (props) => {
                     </ul>
 
                     {/* <!-- User Area --> */}
-                    <DropdownUser/>
+                    <DropdownUser onClick={logoutUser} dataUser={props.dataUser}/>
                     {/* <!-- User Area --> */}
                 </div>
             </div>

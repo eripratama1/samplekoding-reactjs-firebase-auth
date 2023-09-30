@@ -43,19 +43,24 @@ const DropdownUser = ({ onClick, dataUser }) => {
         to="#"
       >
         <span className="hidden text-right lg:block">
-          <span className="block text-sm font-medium text-black dark:text-white">
-            Your Name
-          </span>
-          <span className="block text-xs">UX Designer</span>
+          {/* Mapping dataUser array object untuk menampilkan nilai yang ada pada dataUser */}
+          {dataUser.map((item) => <React.Fragment key={item}>
+            <span className="block text-sm font-medium text-black dark:text-white">
+              {item.name}
+            </span>
+            <span className="block text-xs">{item.email}</span>
+          </React.Fragment>)}
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <img src={UserOne} alt="User" />
-          {/* {dataUser.map((item) =>
+          {/* <img src={UserOne} alt="User" /> */}
+          {dataUser.map((item) =>
             <React.Fragment key={item}>
+              {/* kode dibawah ini memeriksa apakah properti item.image ada atau tidak. Jika ada, kita akan menggunakan nilai dari item.image sebagai sumber gambarnya. 
+              Jika tidak ada, kita akan menggunakan URL avatar default yang dibuat dengan nama pengguna (item.name) sebagai sumber gambarnya. */}
               <img src={item.image ? item.image : `https://ui-avatars.com/api/?name=${item.name}`} className="rounded-full" alt="User" />
             </React.Fragment>
-          )} */}
+          )}
         </span>
 
         <svg
