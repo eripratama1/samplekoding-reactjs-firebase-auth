@@ -1,12 +1,38 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import LogoDark from "../../images/logo/logo-dark.svg"
 import Logo from "../../images/logo/logo.svg"
+import toast, { Toaster } from 'react-hot-toast'
+import { sendPasswordResetEmail } from 'firebase/auth'
+import { auth } from '../../hooks/firebase'
 
 const ResetPassword = () => {
 
+  const [email, setEmail] = useState('')
+
+  const resetPasswordUser = (e) => {
+    e.preventDefault()
+
+    // Menjalankan proses validasi jika email kosong tampilkan toast error
+    if (!email) {
+      return toast.error("Email masih kosong")
+    }
+
+    // Fungsi ini digunakan untuk mengirim email reset password kepada pengguna. fungsi ini menerima dua parameter, yaitu 
+    // objek auth yang merupakan bagian dari Firebase Authentication, dan alamat email yang akan menerima email reset password.
+    // dari user
+    sendPasswordResetEmail(auth,email).then(() => {
+
+      // Jika berhasil tampilkan pesan berikut jika tidak tampilkan pesan error 
+      toast.success("Email reset password terkirim")
+    }).catch((error) => {
+      toast.error(error)
+    })
+
+  }
   return (
     <>
+    <Toaster/>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
@@ -153,7 +179,7 @@ const ResetPassword = () => {
                 Reset Password
               </h2>
 
-              <form>
+              <form onSubmit={resetPasswordUser}>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
@@ -162,6 +188,8 @@ const ResetPassword = () => {
                     <input
                       type="email"
                       placeholder="Enter your email"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
 
